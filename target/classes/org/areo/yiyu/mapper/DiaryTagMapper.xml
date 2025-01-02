@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.areo.yiyu.mapper.DiaryTagMapper">
+    <insert id="insertDiaryTagWithDiaryIdAndTagId">
+        insert into diary_tag (diaryid, tagid, status, userid,create_time, last_modify_time)
+        values (#{diaryId},#{tagId},0,#{userId},#{now},#{now});
+    </insert>
+    <update id="diaryTagFakeDeleteById">
+        update diary_tag
+        set status = 1,
+            last_modify_time = #{now}
+        where diaryid = #{diaryId} and tagid = #{tagId} and userid = #{userId} and status = 0;
+    </update>
+    <select id="getDiaryIdsByTagId" resultType="java.lang.Integer">
+        select diaryid
+        from diary_tag
+        where tagid = #{tagId} and status = 0;
+    </select>
+
+    <select id="getTagIdsByDiaryId" resultType="java.lang.Integer">
+        select tagid
+        from diary_tag
+        where diaryid = #{diaryId} and userid = #{userId} and status = 0;
+    </select>
+    <select id="isTagOnlyUsedByThisDiary" resultType="java.lang.Boolean">
+        select count(*) = 1 as only_used
+        from diary_tag
+        where tagid = #{tagId} and diaryId = #{diaryId} and status = 0 and userid = #{userId};
+    </select>
+</mapper>

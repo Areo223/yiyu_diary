@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.areo.yiyu.mapper.DiaryMapper">
+
+    <insert id="insertDiary" useGeneratedKeys="true" keyProperty="diary.id">-- 返回diary的id值到id中
+        insert into diary (text, create_time, last_modify_time, status, userid)
+        values (#{diary.text},#{now},#{now},0,#{userId});
+    </insert>
+
+    <update id="diaryFakeDeleteByIds">
+        update diary
+        set status = 1,
+            last_modify_time = #{now}
+        where id = #{diaryIds} and userid = #{userId} and status = 0;
+    </update>
+
+    <update id="updateDiary">
+        update diary
+        set text = #{diary.text},
+            last_modify_time = #{now}
+        where id = #{diary.id} and userid = #{userId} and status = 0;
+    </update>
+
+    <select id="listDiaryByCondition" resultType="org.areo.yiyu.entity.Diary">-- java.lang.Integer
+        select distinct d.*
+        from diary d
+        left join diary_tag dt on d.id = dt.diaryid
+        left join tag t on dt.tagid = t.id
+        <where>
+            <if test="text !=null and text != '' ">
+                d.text like concat('%',#{text},'%')
+            </if>
+            <if test="tag != null and tag != '' ">
+                and t.tag_content like concat('%',#{tag},'%')
+            </if>
+            <if test="beginTime != null and endTime != null">
+                and d.create_time between #{beginTime} and #{endTime}
+            </if>
+                and d.userid = #{userId}
+                and d.status = 0
+                order by d.${sortBy} ${order}
+        </where>
+    </select>
+
+
+    <select id="getDiaryById" resultType="org.areo.yiyu.entity.Diary">
+        select *
+        from diary
+        where id = #{diaryId} and status = 0;
+    </select>
+    <select id="isDiaryDeleted" resultType="java.lang.Boolean">
+        select case when status = 1 then true else false end
+        from diary
+        where id = #{diaryId};
+    </select>
+
+</mapper>

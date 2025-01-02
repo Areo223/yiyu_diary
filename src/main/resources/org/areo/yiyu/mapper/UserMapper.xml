@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.areo.yiyu.mapper.UserMapper">
+
+
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        insert into user (phoneNumber, password)
+        values (#{phoneNumber},#{password});
+    </insert>
+
+
+    <select id="isNewUserWithPhoneNumber" resultType="java.lang.Boolean">
+        select case when count(*) > 0 then false else true end
+        from user
+        where phoneNumber = #{phoneNumber};
+    </select>
+
+
+    <select id="getUserWithPhoneNumberAndPassword" resultType="org.areo.yiyu.entity.User">
+        select *
+        from user
+        where phoneNumber = #{phoneNumber} and password = #{password};
+    </select>
+    <select id="getUserWithId" resultType="org.areo.yiyu.entity.User">
+        select *
+        from user
+        where id = #{id};
+    </select>
+</mapper>
